@@ -1,0 +1,76 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2020  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and any partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details, at
+# https://fpgasoftware.intel.com/eula.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 20.1.0 Build 711 06/05/2020 SJ Lite Edition
+# Date created = 13:00:05  December 01, 2023
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		garage_dsd_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "MAX 10"
+set_global_assignment -name DEVICE 10M50DAF484C7G
+set_global_assignment -name TOP_LEVEL_ENTITY garage_dsd
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 20.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "13:00:05  DECEMBER 01, 2023"
+set_global_assignment -name LAST_QUARTUS_VERSION "22.1std.2 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+set_global_assignment -name VHDL_FILE garage_dsd.vhd
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VHDL_FILE servo.vhd
+set_location_assignment PIN_N5 -to clk
+set_location_assignment PIN_AA5 -to lamp
+set_location_assignment PIN_B20 -to leds[1]
+set_location_assignment PIN_A20 -to leds[2]
+set_location_assignment PIN_B19 -to leds[3]
+set_location_assignment PIN_A21 -to leds[4]
+set_location_assignment PIN_B21 -to leds[5]
+set_location_assignment PIN_C22 -to leds[6]
+set_location_assignment PIN_B22 -to leds[7]
+set_location_assignment PIN_A7 -to openbutton
+set_location_assignment PIN_V10 -to pwm
+set_location_assignment PIN_AA8 -to sensor_in
+set_location_assignment PIN_AA7 -to sensor_out
+set_location_assignment PIN_AB7 -to lightSensor[0]
+set_location_assignment PIN_AB9 -to lightSensor[2]
+set_location_assignment PIN_AA11 -to lightSensor[4]
+set_location_assignment PIN_AA12 -to lightSensor[5]
+set_location_assignment PIN_AB8 -to lightSensor[1]
+set_location_assignment PIN_Y10 -to lightSensor[3]
+set_location_assignment PIN_AB17 -to lightSensor[6]
+set_location_assignment PIN_AA17 -to lightSensor[7]
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

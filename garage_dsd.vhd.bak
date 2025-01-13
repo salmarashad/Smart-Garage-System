@@ -1,0 +1,146 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+USE ieee.std_logic_unsigned.all;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+Entity garage_dsd IS
+PORT (sensor_in,sensor_out,openbutton,clk:IN STD_LOGIC;
+      lightSensor:IN STD_LOGIC;
+		
+		leds:OUT STD_LOGIC_VECTOR(1 TO 7);
+		lamp:Out Std_logic;
+		        pwm: out std_logic);
+END garage_dsd;
+
+ARCHITECTURE arch OF garage_dsd IS
+type integer_vector is array (natural range <>) of integer;
+signal buff : integer_vector(0 to 4);
+signal c: Integer:=0;
+signal sensor_in_prevState: STD_LOGIC:='1';
+signal sensor_out_prevState: STD_LOGIC:='1';
+Signal openbutton_prevState :std_logic:='1';
+signal freqCount: Integer:=2000000;
+signal startCount: Integer:=0;
+-- motor --
+constant clk_hz : real := 10.0e6; -- 10 megahertz 
+constant pulse_hz : real := 50.0; -- PWM pulse frequency
+constant min_pulse_us : real :=500.0;-- uS pulse width at min position
+constant max_pulse_us : real:= 2500.0;-- uS pulse width at max position
+constant  step_count : positive := 2**8; -- 256 positions for 180 degrees so 127 for 90 degrees and 0 for 0 degrees
+signal position: integer range 0 to step_count -1;
+signal motor_ctrl: std_logic := '0';
+signal shiftRegister : STD_LOGIC_VECTOR(8 downto 0) := (others => '0');
+signal receive_state : integer := 0;
+signal lightSensorAct: integer;
+ -- when 1 motor moves when 0 motor doesnt move 
+-- end motor -- 
+	
+BEGIN 
+PROCESS(clk)
+begin
+
+IF clk'EVENT AND clk='1'  THEN
+        if rising_edge(clk) then
+            -- State machine for receiving data
+            case receive_state is
+                when 0 =>
+                    -- Wait for start of frame (start bit)
+                    if lightSensor = '0' then
+                        receive_state <= 1;
+                        shiftRegister(0) <= lightSensor;
+                    end if;
+
+                when 1 to 8 =>
+                    -- Receive data bits
+                    shiftRegister(receive_state) <= lightSensor;
+                    receive_state <= receive_state + 1;
+
+                when 9 =>
+                    -- Wait for stop bit and update output
+                    if lightSensor = '1' then
+                        receive_state <= 0;
+                    end if;
+
+                when others =>
+                    -- Reset state if unexpected condition
+                    receive_state <= 0;
+            end case;
+        end if;
+
+if(shiftRegister>=140)then
+   lamp<='0';
+else
+   lamp<='1';
+	end if;
+
+IF openbutton_prevState /= openbutton THEN
+  IF openbutton='1'THEN
+    if (c/=4)then
+	   motor_ctrl<='1';
+		end if;
+	  openbutton_prevState<='1';
+   else
+	   openbutton_prevState<='0';
+	end if;
+end if;
+
+if motor_ctrl='1' then position<=127;
+
+end if;
+   startCount <= startCount+1;
+if startCount = freqCount then
+startCount<=0;
+ IF sensor_in_prevState /= sensor_in THEN
+  IF sensor_in='1'THEN
+if (c=4) THEN
+     c<=4;
+	else
+	  c<=c+1;
+	 end if;
+	  motor_ctrl<='0';
+	  position<=0;
+
+	  sensor_in_prevState<='1';
+   else
+	  sensor_in_prevState<='0';
+	end if;
+	end if;
+	End IF;
+if startCount = freqCount then
+startCount<=0;
+ IF sensor_out_prevState /= sensor_out THEN
+  IF sensor_out='1'then
+	 if (c=0) then
+	  c<=0;
+	 else
+	  c<=c-1;
+	 end if;
+	sensor_out_prevState<='1';
+  else
+	sensor_out_prevState<='0';
+	END IF;  	
+  END IF;
+  END IF;
+END IF;
+	  CASE c IS 
+			   WHEN 0 => leds <= "0000001";
+  			   WHEN 1 => leds <= "1001111";
+				WHEN 2 => leds <= "0010010";
+			   WHEN 3 => leds <= "0000110";
+				WHEN 4 => leds <= "1001100";
+				WHEN 5 => leds <= "0100100";
+				WHEN 6 => leds <= "0100000";
+				WHEN 7 => leds <= "0001111";
+				WHEN 8 => leds <= "0000000";
+				WHEN 9 => leds <= "0000100";
+			   WHEN OTHERS =>leds<="1111111";
+		END CASE;	
+END PROCESS;
+
+StageServo: entity work.servo(rt1)
+generic map (clk_hz,pulse_hz,min_pulse_us,max_pulse_us,step_count)
+port map (clk,'0', position, pwm);
+
+
+END arch;
